@@ -3,6 +3,25 @@
 const schema = 'bigdata';
 
 module.exports = (sequelize, Sequelize) => {
+    const Livro = sequelize.define(
+        'cadLivro',
+        {
+            titulo: Sequelize.STRING,
+            nomeArquivo: Sequelize.STRING,
+        },
+        {
+            //tableName: 'my_very_custom_table_name'
+            freezeTableName: true,
+            schema,
+            // indexes: [
+            //     {
+            //         unique: true,
+            //         fields: ['titulo'],
+            //     },
+            // ],
+        }
+    );
+
     const Palavra = sequelize.define(
         'cadPalavra',
         {
@@ -22,29 +41,12 @@ module.exports = (sequelize, Sequelize) => {
         }
     );
 
-    const Livro = sequelize.define(
-        'cadLivro',
+    const LivroPalavra = sequelize.define(
+        'cadLivroPalavra',
         {
-            titulo: Sequelize.STRING,
-            caminho: Sequelize.STRING,
-        },
-        {
-            //tableName: 'my_very_custom_table_name'
-            freezeTableName: true,
-            schema,
-            // indexes: [
-            //     {
-            //         unique: true,
-            //         fields: ['titulo'],
-            //     },
-            // ],
-        }
-    );
-
-    const LivroPalavras = sequelize.define(
-        'cadLivroPalavras',
-        {
+            palavra: Sequelize.STRING,
             qtdOcorrencias: Sequelize.INTEGER,
+            numLinhas: Sequelize.JSON, //ARRAY NO PG
         },
         {
             freezeTableName: true,
@@ -52,38 +54,39 @@ module.exports = (sequelize, Sequelize) => {
         }
     );
 
-    LivroPalavras.associate = models => {
-        models.LivroPalavras.belongsTo(models.Livro, {
+    LivroPalavra.associate = models => {
+        models.LivroPalavra.belongsTo(models.Livro, {
             foreignKey: 'idLivro',
             as: 'livro',
         });
-        models.LivroPalavras.belongsTo(models.Palavra, {
-            foreignKey: 'idPalavra',
-            as: 'palavra',
-        });
+        // models.LivroPalavras.belongsTo(models.Palavra, {
+        //     foreignKey: 'idPalavra',
+        //     as: 'palavra',
+        // });
     };
 
-    const LivroPalavraPosicao = sequelize.define(
-        'cadLivroPalavraPosicao',
-        {
-            numLinha: Sequelize.INTEGER,
-        },
-        {
-            freezeTableName: true,
-            schema,
-        }
-    );
+    // const LivroPalavraPosicao = sequelize.define(
+    //     'cadLivroPalavraPosicao',
+    //     {
+    //         palavra: Sequelize.STRING,
+    //         numLinha: Sequelize.INTEGER,
+    //     },
+    //     {
+    //         freezeTableName: true,
+    //         schema,
+    //     }
+    // );
 
-    LivroPalavraPosicao.associate = models => {
-        models.LivroPalavraPosicao.belongsTo(models.Livro, {
-            foreignKey: 'idLivro',
-            as: 'livro',
-        });
-        models.LivroPalavraPosicao.belongsTo(models.Palavra, {
-            foreignKey: 'idPalavra',
-            as: 'palavra',
-        });
-    };
+    // LivroPalavraPosicao.associate = models => {
+    //     models.LivroPalavraPosicao.belongsTo(models.Livro, {
+    //         foreignKey: 'idLivro',
+    //         as: 'livro',
+    //     });
+    //     // models.LivroPalavraPosicao.belongsTo(models.Palavra, {
+    //     //     foreignKey: 'idPalavra',
+    //     //     as: 'palavra',
+    //     // });
+    // };
 
-    return { Livro, LivroPalavras, LivroPalavraPosicao, Palavra };
+    return { Livro, LivroPalavra, Palavra }; //LivroPalavraPosicao,
 };

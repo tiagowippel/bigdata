@@ -4,7 +4,7 @@ const readline = require('readline');
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const directoryPath = path.join('c:', 'aaa', 'livros');
+const directoryPath = path.join('livros');
 
 const hashPalavras = {};
 let contaPalavras = 0;
@@ -24,9 +24,7 @@ fs.readdir(directoryPath, function(err, files) {
                 let dis = 0;
 
                 const rl = readline.createInterface({
-                    input: fs.createReadStream(
-                        path.join('c:', 'aaa', 'livros', file)
-                    ),
+                    input: fs.createReadStream(path.join('livros', file)),
                     crlfDelay: Infinity,
                 });
 

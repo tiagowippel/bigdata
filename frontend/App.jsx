@@ -100,13 +100,49 @@ class App extends React.Component {
 
 export default App;
 
+import WordCloud from 'react-d3-cloud';
+
+// const data = [
+//     { text: 'Hey', value: 1000 },
+//     { text: 'lol', value: 200 },
+//     { text: 'first impression', value: 800 },
+//     { text: 'very cool', value: 1000000 },
+//     { text: 'duck', value: 10 },
+// ];
+
+const fontSizeMapper = word => Math.log(word.value * 10) * 5;
+const rotate = word => word.value % 360;
+
 @observer
 class Dashboard extends React.Component {
     constructor(props) {
         super(props);
     }
 
-    componentDidMount() {}
+    data = [];
+
+    componentDidMount() {
+        client
+            .query({
+                query: gql`
+                    query {
+                        getWords
+                    }
+                `,
+            })
+            .then(res => {
+                const words = res.data.getWords;
+
+                console.log(words);
+
+                this.data = words.map(item => ({
+                    text: item.palavra,
+                    value: item.qtdOcorrencias,
+                }));
+
+                this.forceUpdate();
+            });
+    }
 
     render() {
         return (
@@ -129,14 +165,18 @@ class Dashboard extends React.Component {
                     <Route
                         path="/teste"
                         component={props => (
-                            <Card
-                                style={{
-                                    maxWidth: '500px',
-                                    margin: '10px auto',
-                                }}
-                            >
-                                <h1>Teste</h1>
-                            </Card>
+                            // <Card
+                            //     style={{
+                            //         maxWidth: '500px',
+                            //         margin: '10px auto',
+                            //     }}
+                            // >
+                            <WordCloud
+                                data={this.data}
+                                fontSizeMapper={fontSizeMapper}
+                                rotate={rotate}
+                            />
+                            // </Card>
                         )}
                     />
                     <Route path="/404" component={props => <h1>404</h1>} />

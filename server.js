@@ -2,6 +2,12 @@
 
 //TODO  WINSTON LOG
 
+// const teste = new Set();
+// teste.add(1);
+// teste.add(1);
+// teste.add(2);
+// console.log(teste);
+
 require('dotenv').config();
 
 const path = require('path');

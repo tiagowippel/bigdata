@@ -46,8 +46,15 @@ module.exports = {
             {
                 test: /\.less$/,
                 use: [
+                    // {
+                    //     loader: 'style-loader',
+                    // },
                     {
-                        loader: 'style-loader',
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            //hmr: process.env.NODE_ENV === 'development',
+                            //reloadAll: true,
+                        },
                     },
                     {
                         loader: 'css-loader', // translates CSS into CommonJS
