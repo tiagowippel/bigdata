@@ -31,7 +31,7 @@ const models = require('./backend/models')(sequelize, Sequelize);
 
 sequelize
     .sync({
-        force: false,
+        force: true,
         match: /_test$/,
     })
     .then(res => {});

@@ -12,6 +12,8 @@ const path = require('path');
 const readline = require('readline');
 const Promise = require('bluebird');
 
+const sw = require('stopword');
+
 module.exports = models => {
     const api = express.Router();
 
@@ -82,7 +84,9 @@ module.exports = models => {
                                             ' '
                                         );
 
-                                        const arr = line.split(' ');
+                                        let arr = line.split(' ');
+
+                                        arr = sw.removeStopwords(arr);
 
                                         for (let j = 0; j < arr.length; j++) {
                                             const p = arr[j];
