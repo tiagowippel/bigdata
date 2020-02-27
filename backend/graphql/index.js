@@ -43,7 +43,6 @@ module.exports = models => {
 
                         type Query {
                             teste: JSON
-                            getWords: JSON
                         }
 
                         type Mutation {
@@ -53,19 +52,7 @@ module.exports = models => {
                 ],
                 resolvers: [
                     {
-                        Query: {
-                            getWords(parent, args, context, info) {
-                                // return [
-                                //     { palavra: 'aaa', qtdOcorrencias: 200000 },
-                                //     { palavra: 'bbb', qtdOcorrencias: 10 },
-                                // ];
-                                return models.Palavra.findAll({
-                                    limit: 100,
-                                    order: [['qtdOcorrencias', 'DESC']],
-                                    raw: true,
-                                });
-                            },
-                        },
+                        Query: {},
                         Mutation: {},
                     },
                 ],

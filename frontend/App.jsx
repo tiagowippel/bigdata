@@ -113,35 +113,9 @@ import WordCloud from 'react-d3-cloud';
 const fontSizeMapper = word => Math.log(word.value * 10) * 5;
 const rotate = word => word.value % 360;
 
-@observer
 class Dashboard extends React.Component {
     constructor(props) {
         super(props);
-    }
-
-    data = [];
-
-    componentDidMount() {
-        client
-            .query({
-                query: gql`
-                    query {
-                        getWords
-                    }
-                `,
-            })
-            .then(res => {
-                const words = res.data.getWords;
-
-                console.log(words);
-
-                this.data = words.map(item => ({
-                    text: item.palavra,
-                    value: item.qtdOcorrencias,
-                }));
-
-                this.forceUpdate();
-            });
     }
 
     render() {
@@ -163,25 +137,123 @@ class Dashboard extends React.Component {
                         )}
                     />
                     <Route
-                        path="/teste"
-                        component={props => (
-                            // <Card
-                            //     style={{
-                            //         maxWidth: '500px',
-                            //         margin: '10px auto',
-                            //     }}
-                            // >
-                            <WordCloud
-                                data={this.data}
-                                fontSizeMapper={fontSizeMapper}
-                                rotate={rotate}
-                            />
-                            // </Card>
-                        )}
+                        path="/nuvemPalavras"
+                        component={props => <NuvemPalavras />}
+                    />
+                    <Route
+                        path="/buscaPalavras"
+                        component={props => <BuscaPalavras />}
                     />
                     <Route path="/404" component={props => <h1>404</h1>} />
                     <Route component={() => <Redirect to="/404" />} />
                 </Switch>
+            </>
+        );
+    }
+}
+
+class NuvemPalavras extends React.Component {
+    data = [];
+
+    componentDidMount() {
+        client
+            .query({
+                query: gql`
+                    query {
+                        getWords
+                    }
+                `,
+            })
+            .then(res => {
+                const words = res.data.getWords;
+
+                console.log(words);
+
+                this.data = words.map((item, k) => ({
+                    text: item.palavra,
+                    value: item.qtdOcorrencias * (k < 5 ? 100000 : 1),
+                }));
+
+                this.forceUpdate();
+            });
+    }
+
+    render() {
+        return (
+            <div>
+                <WordCloud
+                    data={this.data}
+                    fontSizeMapper={fontSizeMapper}
+                    rotate={rotate}
+                />
+            </div>
+        );
+    }
+}
+
+@observer
+class BuscaPalavras extends React.Component {
+    @observable value = '';
+    @observable lista = [];
+
+    componentDidMount() {}
+
+    render() {
+        return (
+            <>
+                <div
+                    style={{
+                        display: 'flex',
+                    }}
+                >
+                    <Input
+                        placeholder="Palavra"
+                        value={this.value}
+                        onChange={e => {
+                            this.value = e.target.value;
+                        }}
+                    ></Input>
+                    <Button
+                        type="primary"
+                        onClick={e => {
+                            client
+                                .query({
+                                    query: gql`
+                                        query($options: JSON!) {
+                                            getLivros(options: $options)
+                                        }
+                                    `,
+                                    variables: {
+                                        options: {
+                                            palavra: this.value,
+                                        },
+                                    },
+                                })
+                                .then(res => {
+                                    const data = res.data.getLivros;
+
+                                    console.log(data);
+                                });
+                        }}
+                    >
+                        Enviar
+                    </Button>
+                </div>
+                <div>
+                    <Table
+                        columns={[
+                            {
+                                title: 'Livro',
+                                dataIndex: 'livro',
+                            },
+                            {
+                                title: 'Qtd. ocorrencias da palavra',
+                                dataIndex: 'qtdOcorrencias',
+                            },
+                        ]}
+                        dataSource={this.lista}
+                    ></Table>
+                </div>
             </>
         );
     }
