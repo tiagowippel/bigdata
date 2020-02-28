@@ -3,6 +3,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import Highlighter from 'react-highlight-words';
+
 const Teste = props => {
     return <h1>Teste</h1>;
 };
@@ -194,7 +196,9 @@ class NuvemPalavras extends React.Component {
 @observer
 class BuscaPalavras extends React.Component {
     @observable value = '';
+
     @observable lista = [];
+    @observable listaLinhas = null;
 
     componentDidMount() {}
 
@@ -231,8 +235,8 @@ class BuscaPalavras extends React.Component {
                                 })
                                 .then(res => {
                                     const data = res.data.getLivros;
-
-                                    console.log(data);
+                                    //console.log(data);
+                                    this.lista = data;
                                 });
                         }}
                     >
@@ -244,7 +248,7 @@ class BuscaPalavras extends React.Component {
                         columns={[
                             {
                                 title: 'Livro',
-                                dataIndex: 'livro',
+                                dataIndex: 'livro.titulo',
                             },
                             {
                                 title: 'Qtd. ocorrencias da palavra',
@@ -252,8 +256,74 @@ class BuscaPalavras extends React.Component {
                             },
                         ]}
                         dataSource={this.lista}
+                        rowKey="id"
+                        pagination={false}
+                        onRow={(record, rowIndex) => {
+                            return {
+                                onClick: e => {
+                                    client
+                                        .query({
+                                            query: gql`
+                                                query($options: JSON!) {
+                                                    getLivroLinhas(
+                                                        options: $options
+                                                    )
+                                                }
+                                            `,
+                                            variables: {
+                                                options: {
+                                                    idLivro: record.id,
+                                                },
+                                            },
+                                        })
+                                        .then(res => {
+                                            const data =
+                                                res.data.getLivroLinhas;
+                                            this.listaLinhas = data;
+                                        });
+                                },
+                            };
+                        }}
                     ></Table>
                 </div>
+                <Modal
+                    title="Linhas"
+                    visible={this.listaLinhas !== null}
+                    onCancel={() => {
+                        this.listaLinhas = null;
+                    }}
+                    width={800}
+                    footer={null}
+                >
+                    <Table
+                        columns={[
+                            {
+                                title: 'Número',
+                                dataIndex: 'numero',
+                            },
+                            {
+                                title: 'Conteúdo',
+                                dataIndex: 'conteudo',
+                                render: (text, record) => {
+                                    return (
+                                        <Highlighter
+                                            //highlightClassName="YourHighlightClass"
+                                            //autoEscape={true}
+                                            searchWords={[this.value]}
+                                            textToHighlight={text}
+                                            highlightStyle={{
+                                                backgroundColor: '#ffff00',
+                                            }}
+                                        />
+                                    );
+                                },
+                            },
+                        ]}
+                        dataSource={this.listaLinhas}
+                        rowKey="numero"
+                        pagination={false}
+                    ></Table>
+                </Modal>
             </>
         );
     }
