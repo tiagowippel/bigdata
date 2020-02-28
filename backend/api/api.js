@@ -43,7 +43,7 @@ module.exports = models => {
                         return new Promise(resolve => {
                             {
                                 let dis = 0;
-                                let title = '';
+                                let title = file;
 
                                 const rl = readline.createInterface({
                                     input: fs.createReadStream(
