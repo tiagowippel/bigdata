@@ -27,6 +27,7 @@
         "lodash": "^4.17.15",
         "moment": "^2.24.0",
         "numeral": "^2.0.6",
+        "pg": "^7.18.2",
         "react-d3-cloud": "^0.7.0",
         "react-highlight-words": "^0.16.0",
         "react-scroll": "^1.7.16",

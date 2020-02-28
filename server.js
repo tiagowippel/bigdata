@@ -21,17 +21,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('database_test', 'username', 'password', {
-    dialect: 'sqlite',
-    storage: 'database.sqlite',
+const sequelize = new Sequelize('bigdata_test', 'admin', '123', {
+    //dialect: 'sqlite',
+    //storage: 'database.sqlite',
     logging: txt => {},
+    host: 'localhost',
+    dialect: 'postgres',
+    //dialectOptions: { decimalNumbers: true },
+    //operatorsAliases: false,
 });
 
 const models = require('./backend/models')(sequelize, Sequelize);
 
 sequelize
     .sync({
-        force: false,
+        force: true,
         match: /_test$/,
     })
     .then(res => {});
@@ -52,9 +56,10 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-app.listen(3000, () => {
+const srv = app.listen(3000, () => {
     console.log('Example app listening on port 3000!');
 });
+srv.setTimeout(24 * 60 * 60 * 1000);
 
 const graphql = require('./backend/graphql')(models);
 
