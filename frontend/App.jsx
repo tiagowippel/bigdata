@@ -162,12 +162,12 @@ class NuvemPalavras extends React.Component {
             .query({
                 query: gql`
                     query {
-                        getWords
+                        getPalavras
                     }
                 `,
             })
             .then(res => {
-                const words = res.data.getWords;
+                const words = res.data.getPalavras;
 
                 console.log(words);
 
@@ -199,6 +199,7 @@ class BuscaPalavras extends React.Component {
 
     @observable lista = [];
     @observable listaLinhas = null;
+    @observable linhasLivro = null;
 
     componentDidMount() {}
 
@@ -261,19 +262,16 @@ class BuscaPalavras extends React.Component {
                         onRow={(record, rowIndex) => {
                             return {
                                 onClick: e => {
+                                    this.idLivro = record.idLivro;
                                     client
                                         .query({
                                             query: gql`
-                                                query($options: JSON!) {
-                                                    getLivroLinhas(
-                                                        options: $options
-                                                    )
+                                                query($id: Int!) {
+                                                    getLivroLinhas(id: $id)
                                                 }
                                             `,
                                             variables: {
-                                                options: {
-                                                    idLivro: record.id,
-                                                },
+                                                id: record.id,
                                             },
                                         })
                                         .then(res => {
@@ -322,7 +320,83 @@ class BuscaPalavras extends React.Component {
                         dataSource={this.listaLinhas}
                         rowKey="numero"
                         pagination={false}
+                        onRow={(record, rowIndex) => {
+                            return {
+                                onClick: e => {
+                                    this.numLinha = record.numero;
+                                    client
+                                        .query({
+                                            query: gql`
+                                                query($id: Int!) {
+                                                    getLivro(id: $id)
+                                                }
+                                            `,
+                                            variables: {
+                                                id: this.idLivro,
+                                            },
+                                        })
+                                        .then(res => {
+                                            const data = res.data.getLivro;
+                                            this.linhasLivro = data.linhas;
+                                            setTimeout(() => {
+                                                this.myref.scrollIntoView({
+                                                    behavior: 'smooth',
+                                                });
+                                            }, 500);
+                                        });
+                                },
+                            };
+                        }}
                     ></Table>
+                </Modal>
+                <Modal
+                    title="Livro"
+                    visible={this.linhasLivro !== null}
+                    onCancel={() => {
+                        this.linhasLivro = null;
+                    }}
+                    width={1000}
+                    footer={null}
+                >
+                    {this.linhasLivro && (
+                        <div>
+                            {/* <button
+                                onClick={e => {
+                                    this.myref.scrollIntoView({
+                                        //behavior: 'smooth',
+                                    });
+                                }}
+                            >
+                                teste
+                            </button> */}
+                            {this.linhasLivro.map((item, k) => {
+                                if (k === this.numLinha - 1) {
+                                    return (
+                                        <p
+                                            key={k}
+                                            ref={obj => {
+                                                this.myref = obj;
+                                            }}
+                                        >
+                                            <Highlighter
+                                                //highlightClassName="YourHighlightClass"
+                                                //autoEscape={true}
+                                                searchWords={[this.value]}
+                                                textToHighlight={item}
+                                                highlightStyle={{
+                                                    backgroundColor: '#ffff00',
+                                                }}
+                                            />
+                                        </p>
+                                    );
+                                } else {
+                                    return (
+                                        <p key={k}>{`${item}`}</p> //${k}
+                                    );
+                                }
+                            })}
+                        </div>
+                    )}
                 </Modal>
             </>
         );

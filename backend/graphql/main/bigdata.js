@@ -31,9 +31,10 @@ module.exports = models => {
 
     const typeDefs = gql`
         extend type Query {
-            getWords: JSON
+            getPalavras: JSON
             getLivros(options: JSON!): JSON
-            getLivroLinhas(options: JSON!): JSON
+            getLivroLinhas(id: Int!): JSON
+            getLivro(id: Int!): JSON
         }
         # extend type Mutation {
         # }
@@ -41,7 +42,7 @@ module.exports = models => {
 
     const resolvers = {
         Query: {
-            getWords(parent, args, context, info) {
+            getPalavras(parent, args, context, info) {
                 // return [
                 //     { palavra: 'aaa', qtdOcorrencias: 200000 },
                 //     { palavra: 'bbb', qtdOcorrencias: 10 },
@@ -75,7 +76,7 @@ module.exports = models => {
                 // });
             },
             getLivroLinhas(parent, args, context, info) {
-                return models.LivroPalavra.findByPk(args.options.idLivro, {
+                return models.LivroPalavra.findByPk(args.id, {
                     include: [
                         {
                             model: models.Livro,
@@ -124,6 +125,40 @@ module.exports = models => {
                 // .then(livros => {
                 //     return livros.toJSON();
                 // });
+            },
+            getLivro(parent, args, context, info) {
+                return models.Livro.findByPk(args.id, {
+                    raw: true,
+                    //nested: true,
+                }).then(livro => {
+                    return new Promise(resolve => {
+                        {
+                            const rl = readline.createInterface({
+                                input: fs.createReadStream(
+                                    path.join(
+                                        process.cwd(),
+                                        'livros',
+                                        livro.nomeArquivo
+                                    )
+                                ),
+                                crlfDelay: Infinity,
+                            });
+
+                            const arr = [];
+
+                            rl.on('line', line => {
+                                arr.push(line);
+                            });
+
+                            rl.on('close', () => {
+                                resolve({
+                                    titulo: livro.titulo,
+                                    linhas: arr,
+                                });
+                            });
+                        }
+                    });
+                });
             },
         },
         // Mutation: {},
