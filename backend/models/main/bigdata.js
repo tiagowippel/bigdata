@@ -37,6 +37,10 @@ module.exports = (sequelize, Sequelize) => {
                     unique: true,
                     fields: ['palavra'],
                 },
+                {
+                    //unique: true,
+                    fields: ['qtdOcorrencias'],
+                },
             ],
         }
     );
@@ -51,6 +55,12 @@ module.exports = (sequelize, Sequelize) => {
         {
             freezeTableName: true,
             schema,
+            indexes: [
+                {
+                    unique: false,
+                    fields: ['palavra'],
+                },
+            ],
         }
     );
 
