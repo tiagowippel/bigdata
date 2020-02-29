@@ -43,7 +43,7 @@ module.exports = models => {
                         return new Promise(resolve => {
                             {
                                 let dis = 0;
-                                let title = file;
+                                let title = '';
 
                                 const rl = readline.createInterface({
                                     input: fs.createReadStream(
@@ -180,9 +180,11 @@ module.exports = models => {
 
                                     //console.log(hashPalavras2);
 
+                                    //return resolve();
+
                                     return livro
                                         .update({
-                                            titulo: title,
+                                            titulo: title === '' ? file : title,
                                             //caminho: file,
                                         })
                                         .then(() => {
@@ -213,16 +215,32 @@ module.exports = models => {
                     });
                 }
             ).then(() => {
-                return models.Palavra.bulkCreate(
-                    _.values(hashPalavras).map(item => {
-                        return {
-                            palavra: item.p,
-                            qtdOcorrencias: item.q,
-                        };
-                    })
-                ).then(values => {
-                    return res.send({ ok: true, qtd: values.length });
+                const chuncks = _.chunk(_.values(hashPalavras), 100000);
+
+                return Promise.each(chuncks, (item, index) => {
+                    console.log(index);
+
+                    return models.Palavra.bulkCreate(
+                        item.map(item2 => {
+                            return {
+                                palavra: item2.p,
+                                qtdOcorrencias: item2.q,
+                            };
+                        })
+                    );
+                }).then(() => {
+                    return res.send({ ok: true });
                 });
+                // return models.Palavra.bulkCreate(
+                //     _.values(hashPalavras).map(item => {
+                //         return {
+                //             palavra: item.p,
+                //             qtdOcorrencias: item.q,
+                //         };
+                //     })
+                // ).then(values => {
+                //     return res.send({ ok: true, qtd: values.length });
+                // });
             });
         });
     });

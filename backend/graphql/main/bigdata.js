@@ -93,7 +93,9 @@ module.exports = models => {
                             const rl = readline.createInterface({
                                 input: fs.createReadStream(
                                     path.join(
-                                        process.cwd(),
+                                        //process.cwd(),
+                                        'c:',
+                                        'aaa',
                                         'livros',
                                         livro.livro.nomeArquivo
                                     )
@@ -136,7 +138,9 @@ module.exports = models => {
                             const rl = readline.createInterface({
                                 input: fs.createReadStream(
                                     path.join(
-                                        process.cwd(),
+                                        //process.cwd(),
+                                        'c:',
+                                        'aaa',
                                         'livros',
                                         livro.nomeArquivo
                                     )
