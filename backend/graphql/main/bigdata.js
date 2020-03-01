@@ -54,6 +54,7 @@ module.exports = models => {
                 });
             },
             getLivros(parent, args, context, info) {
+                const antes = Date.now();
                 return models.LivroPalavra.findAll({
                     include: [
                         {
@@ -70,10 +71,12 @@ module.exports = models => {
                     order: [['qtdOcorrencias', 'DESC']],
                     raw: true,
                     nested: true,
+                }).then(livros => {
+                    return {
+                        lista: livros,
+                        tempo: Date.now() - antes,
+                    };
                 });
-                // .then(livros => {
-                //     return livros.toJSON();
-                // });
             },
             getLivroLinhas(parent, args, context, info) {
                 return models.LivroPalavra.findByPk(args.id, {

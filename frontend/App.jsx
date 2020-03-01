@@ -197,6 +197,8 @@ class NuvemPalavras extends React.Component {
 class BuscaPalavras extends React.Component {
     @observable value = '';
 
+    @observable tempo = '';
+
     @observable lista = [];
     @observable listaLinhas = null;
     @observable linhasLivro = null;
@@ -237,7 +239,8 @@ class BuscaPalavras extends React.Component {
                                 .then(res => {
                                     const data = res.data.getLivros;
                                     //console.log(data);
-                                    this.lista = data;
+                                    this.lista = data.lista;
+                                    this.tempo = `A busca demorou ${data.tempo} ms.`;
                                 });
                         }}
                     >
@@ -245,6 +248,7 @@ class BuscaPalavras extends React.Component {
                     </Button>
                 </div>
                 <div>
+                    <h1>{this.tempo}</h1>
                     <Table
                         columns={[
                             {
@@ -342,7 +346,7 @@ class BuscaPalavras extends React.Component {
                                                 this.myref.scrollIntoView({
                                                     behavior: 'smooth',
                                                 });
-                                            }, 500);
+                                            }, 1000);
                                         });
                                 },
                             };
@@ -360,15 +364,15 @@ class BuscaPalavras extends React.Component {
                 >
                     {this.linhasLivro && (
                         <div>
-                            {/* <button
+                            <button
                                 onClick={e => {
                                     this.myref.scrollIntoView({
-                                        //behavior: 'smooth',
+                                        behavior: 'smooth',
                                     });
                                 }}
                             >
-                                teste
-                            </button> */}
+                                achar linha
+                            </button>
                             {this.linhasLivro.map((item, k) => {
                                 if (k === this.numLinha - 1) {
                                     return (
